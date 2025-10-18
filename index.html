@@ -550,13 +550,12 @@
             const startEarningBtn = document.getElementById('start-earning-btn');
             const withdrawBtn = document.getElementById('withdraw-btn');
             const withdrawForm = document.getElementById('withdraw-form');
-            // ADDED: Referral elements
+            // REFERRAL ELEMENTS
             const referralLinkElement = document.getElementById('referral-link');
             const copyReferralBtn = document.getElementById('copy-referral-btn');
             
-            // IMPORTANT: Replace 'YOUR_BOT_USERNAME' with your actual Telegram bot username
-            // This is the structure of the referral link using Telegram's deep-linking.
-            const BOT_USERNAME = 'YourEarningBot'; 
+            // CORRECTED: Bot username from user input
+            const BOT_USERNAME = 'Earn_For_USDT_bot'; 
             const referralLinkTemplate = userData.id ? `https://t.me/${BOT_USERNAME}?start=ref_${userData.id}` : 'Link not available. Open through Telegram.';
 
 
@@ -587,31 +586,11 @@
                 }
             }
             
-            // Function to check and update referral count for the *new* user's referrer.
-            /* // NOTE: This part requires the Telegram bot to pass the referrer_id 
-            // either in the initData or to handle the referral logic server-side 
-            // when the new user clicks the deep-link. This function is conceptual 
-            // without a full backend.
-            function checkAndProcessReferral() {
-                // Example: If the bot passes a 'referrer_id' in initDataUnsafe (not standard, but possible)
-                // const referrerId = tg.initDataUnsafe.referrer_id; 
-                // if (referrerId && referrerId !== userData.id) {
-                //     database.ref('users/' + referrerId).once('value', (snapshot) => {
-                //         const referrerData = snapshot.val();
-                //         if (referrerData) {
-                //             const newReferrals = (referrerData.totalReferrals || 0) + 1;
-                //             // Assuming a referral reward, e.g., BDT 0.50 per referral
-                //             const newEarnings = (referrerData.earnings || 0) + 0.50; 
-                //             database.ref('users/' + referrerId).update({
-                //                 earnings: newEarnings,
-                //                 totalReferrals: newReferrals
-                //             });
-                //             tg.showAlert(`Congratulations! You were referred by user ${referrerId} and got a bonus.`); 
-                //         }
-                //     });
-                // }
-            }
-            */
+            // NOTE on Referral Logic: 
+            // The logic for *incrementing* the referrer's count/earnings must be handled 
+            // by the Telegram Bot's backend when a new user clicks the `?start=ref_...` link. 
+            // The Web App's `loadAndSetupUser` function below simply retrieves the *current*
+            // user's total referral count stored in Firebase.
 
             function loadAndSetupUser() {
                 if (userData && userData.id) {
@@ -630,7 +609,6 @@
                         } else {
                             // Create new user entry
                             saveUserData(0, 0, 0); 
-                            // checkAndProcessReferral(); // Call this only on *new* user creation
                         }
                         
                         updateUI();
@@ -720,16 +698,14 @@
             startEarningBtn.addEventListener('click', () => showPage('earn-page'));
             withdrawBtn.addEventListener('click', () => showPage('withdraw-page'));
             
-            // --- ADDED: Copy Referral Link Logic ---
+            // --- Copy Referral Link Logic ---
             copyReferralBtn.addEventListener('click', () => {
                 const link = referralLinkElement.textContent;
                 
-                // Use Telegram's clipboard functionality if available
                 if (tg.isClipboardAvailable) {
                     tg.copyText(link);
                     tg.showAlert('Referral link copied to clipboard!');
                 } else if (navigator.clipboard) {
-                    // Fallback for standard web browser environment
                     navigator.clipboard.writeText(link).then(() => {
                         tg.showAlert('Referral link copied to clipboard!');
                     }).catch(err => {
