@@ -554,7 +554,7 @@
             const referralLinkElement = document.getElementById('referral-link');
             const copyReferralBtn = document.getElementById('copy-referral-btn');
             
-            // CORRECTED: Bot username from user input
+            // ✅ Bot username confirmed by user
             const BOT_USERNAME = 'Earn_For_USDT_bot'; 
             const referralLinkTemplate = userData.id ? `https://t.me/${BOT_USERNAME}?start=ref_${userData.id}` : 'Link not available. Open through Telegram.';
 
@@ -586,16 +586,10 @@
                 }
             }
             
-            // NOTE on Referral Logic: 
-            // The logic for *incrementing* the referrer's count/earnings must be handled 
-            // by the Telegram Bot's backend when a new user clicks the `?start=ref_...` link. 
-            // The Web App's `loadAndSetupUser` function below simply retrieves the *current*
-            // user's total referral count stored in Firebase.
-
             function loadAndSetupUser() {
                 if (userData && userData.id) {
                     
-                    // Display the referral link immediately
+                    // Display the generated referral link
                     referralLinkElement.textContent = referralLinkTemplate;
                     
                     database.ref('users/' + userData.id).once('value', (snapshot) => {
@@ -702,10 +696,12 @@
             copyReferralBtn.addEventListener('click', () => {
                 const link = referralLinkElement.textContent;
                 
+                // Use Telegram's clipboard functionality if available
                 if (tg.isClipboardAvailable) {
                     tg.copyText(link);
                     tg.showAlert('Referral link copied to clipboard!');
                 } else if (navigator.clipboard) {
+                    // Fallback for standard web browser environment
                     navigator.clipboard.writeText(link).then(() => {
                         tg.showAlert('Referral link copied to clipboard!');
                     }).catch(err => {
@@ -717,7 +713,7 @@
                 }
             });
             
-            // --- Rewarded Ad and Earning Logic (Unchanged) ---
+            // --- Rewarded Ad and Earning Logic ---
             watchAdBtn.addEventListener('click', () => {
                 if (!userData.id) {
                     tg.showAlert('Application initialization error: User ID not found.');
@@ -756,7 +752,7 @@
                 }
             });
 
-            // --- Withdrawal Logic (Unchanged) ---
+            // --- Withdrawal Logic ---
             withdrawForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const amount = parseFloat(document.getElementById('withdraw-amount').value);
