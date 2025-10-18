@@ -6,7 +6,6 @@
     <title>My Earning App</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
@@ -475,14 +474,32 @@
 
     <script src='//libtl.com/sdk.js' data-zone='9477103' data-sdk='show_9477103'></script>
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
     <script>
+        // 1. Firebase Initialization
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMVTLS_PK7M4yyMfcdKPHzn8yP1lXxpLQ",
+            databaseURL: "https://text-4cc23-default-rtdb.firebaseio.com",
+            projectId: "text-4cc23",
+            storageBucket: "text-4cc23.appspot.com"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        const database = firebase.database();
+
+        // 2. Main App Logic
         document.addEventListener('DOMContentLoaded', () => {
             const tg = window.Telegram.WebApp;
             tg.ready();
             tg.expand();
-            const userData = tg.initDataUnsafe.user;
-            const defaultProfilePic40 = 'https://via.placeholder.com/40';
-            const defaultProfilePic80 = 'https://via.placeholder.com/80';
+            
+            // Ensure userData is safe before proceeding
+            const userData = tg.initDataUnsafe.user || { id: null }; 
 
             const navItems = document.querySelectorAll('.nav-item');
             const pages = document.querySelectorAll('.page');
@@ -494,34 +511,78 @@
             const DAILY_ADS_LIMIT = 50;
             const AD_REWARD = 0.02; // BDT per ad
             const MIN_WITHDRAW_AMOUNT = 100;
+            
+            const defaultProfilePic40 = 'https://via.placeholder.com/40';
+            const defaultProfilePic80 = 'https://via.placeholder.com/80';
+            
+            // Global variables to hold current user data from Firebase
+            window.userEarnings = 0;
+            window.userAdsWatched = 0;
+            window.userReferrals = 0;
 
-            if (!localStorage.getItem('earnings')) {
-                localStorage.setItem('earnings', '0');
-                localStorage.setItem('adsWatched', '0');
-                localStorage.setItem('totalReferrals', '0');
+            // --- Firebase Data Management Functions ---
+            function saveUserData(earnings, adsWatched, referrals) {
+                if (userData && userData.id) {
+                    database.ref('users/' + userData.id).set({
+                        id: userData.id,
+                        username: userData.username || 'N/A',
+                        first_name: userData.first_name || 'N/A',
+                        earnings: earnings,
+                        adsWatched: adsWatched,
+                        totalReferrals: referrals,
+                        last_update: new Date().toISOString()
+                    });
+                }
             }
 
+            function loadAndSetupUser() {
+                if (userData && userData.id) {
+                    database.ref('users/' + userData.id).once('value', (snapshot) => {
+                        const data = snapshot.val();
+                        
+                        if (data) {
+                            // Load existing data
+                            window.userEarnings = data.earnings || 0;
+                            window.userAdsWatched = data.adsWatched || 0;
+                            window.userReferrals = data.totalReferrals || 0;
+                        } else {
+                            // Create new user entry
+                            saveUserData(0, 0, 0); 
+                        }
+                        
+                        updateUI();
+                    }).catch(error => {
+                        console.error("Firebase fetch error:", error);
+                        tg.showAlert('Data loading failed. Please check your internet connection.');
+                        updateUI(); // Show default 0.00 if fetch fails
+                    });
+                } else {
+                    // Fallback for environment without Telegram user data
+                    tg.showAlert('Error: Could not retrieve Telegram user ID.');
+                    updateUI();
+                }
+            }
+            // --- End Firebase Data Management Functions ---
+
+
             function updateUI() {
-                const earnings = parseFloat(localStorage.getItem('earnings'));
-                const adsWatched = parseInt(localStorage.getItem('adsWatched'));
-                const referrals = parseInt(localStorage.getItem('totalReferrals'));
+                // Read from the global variables updated by loadAndSetupUser or rewarded ad
+                const earnings = window.userEarnings || 0;
+                const adsWatched = window.userAdsWatched || 0;
+                const referrals = window.userReferrals || 0;
 
                 const formattedEarnings = earnings.toFixed(2);
 
-                if(userData) {
+                if(userData && userData.id) {
                     const fullName = `${userData.first_name || ''} ${userData.last_name || ''}`.trim();
                     document.getElementById('header-user-name').textContent = fullName || 'User';
                     document.getElementById('profile-user-name').textContent = fullName || 'User';
                     document.getElementById('profile-user-username').textContent = userData.username ? `@${userData.username}` : 'No username';
                     
-                    // ======================================================================
-                    // ====== প্রোফাইল ছবি দেখানোর কোড (CORS সমস্যার সমাধানসহ) ======
-                    // ======================================================================
                     if (userData.photo_url) {
-                        // টেলিগ্রামের CORS পলিসি এড়ানোর জন্য একটি প্রক্সি ব্যবহার করা হয়েছে।
+                        // Using a simple proxy to bypass potential CORS issues with Telegram photos
                         const proxyUrl = 'https://api.allorigins.win/raw?url=';
                         const proxiedPhotoUrl = `${proxyUrl}${encodeURIComponent(userData.photo_url)}`;
-                        
                         document.getElementById('header-profile-pic').src = proxiedPhotoUrl;
                         document.getElementById('profile-page-pic').src = proxiedPhotoUrl;
                     } else {
@@ -575,27 +636,27 @@
             startEarningBtn.addEventListener('click', () => showPage('earn-page'));
             withdrawBtn.addEventListener('click', () => showPage('withdraw-page'));
             
+            // --- Rewarded Ad and Earning Logic ---
             watchAdBtn.addEventListener('click', () => {
-                if (parseInt(localStorage.getItem('adsWatched')) >= DAILY_ADS_LIMIT) {
+                if (!userData.id) {
+                    tg.showAlert('Application initialization error: User ID not found.');
+                    return;
+                }
+                if (window.userAdsWatched >= DAILY_ADS_LIMIT) {
                     tg.showAlert('আপনার দৈনিক বিজ্ঞাপনের সীমা পৌঁছে গেছে।');
                     return;
                 }
 
                 watchAdBtn.disabled = true;
 
-                // --- অ্যাড নেটওয়ার্কের কোড কল করার জায়গা (দ্বিতীয় অংশ) ---
-                // ======================================================================
-                // এখানে আপনার অ্যাড নেটওয়ার্কের দেওয়া ফাংশনটি কল করা হয়েছে।
-                // 'show_9702412()' ফাংশনটি 'show_9477103('pop')' দ্বারা প্রতিস্থাপিত হয়েছে।
-                // ======================================================================
                 if (typeof show_9477103 === 'function') {
-                    show_9477103('pop').then(() => { // Rewarded Ad Call
+                    show_9477103('pop').then(() => {
                         // Success: user watched the ad
-                        let earnings = parseFloat(localStorage.getItem('earnings')) + AD_REWARD;
-                        let currentAdsWatched = parseInt(localStorage.getItem('adsWatched')) + 1;
+                        window.userEarnings += AD_REWARD;
+                        window.userAdsWatched += 1;
                         
-                        localStorage.setItem('earnings', earnings.toString());
-                        localStorage.setItem('adsWatched', currentAdsWatched.toString());
+                        // Save updated data to Firebase
+                        saveUserData(window.userEarnings, window.userAdsWatched, window.userReferrals);
                         
                         tg.showAlert(`বিজ্ঞাপনটি দেখার জন্য আপনি BDT ${AD_REWARD.toFixed(2)} পেয়েছেন!`);
                     }).catch(e => {
@@ -606,25 +667,44 @@
                         updateUI();
                     });
                 } else {
-                    // Fallback for testing in browser without Telegram
-                    let earnings = parseFloat(localStorage.getItem('earnings')) + AD_REWARD;
-                    let currentAdsWatched = parseInt(localStorage.getItem('adsWatched')) + 1;
-                    localStorage.setItem('earnings', earnings.toString());
-                    localStorage.setItem('adsWatched', currentAdsWatched.toString());
-                    alert(`(Test Mode) You earned BDT ${AD_REWARD.toFixed(2)}!`);
+                    tg.showAlert('Ad SDK not initialized. Running in test mode.');
+                    // Fallback for testing/uninitialized SDK
+                    window.userEarnings += AD_REWARD;
+                    window.userAdsWatched += 1;
                     updateUI();
                 }
             });
 
+            // --- Withdrawal Logic ---
             withdrawForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const amount = parseFloat(document.getElementById('withdraw-amount').value);
+                const currentEarnings = window.userEarnings;
                 
-                tg.showConfirm(`আপনি কি আপনার উইথড্র অনুরোধ জমা দিতে চান?`, (confirmed) => {
+                if (currentEarnings < amount) {
+                    tg.showAlert('ব্যালেন্স অপর্যাপ্ত।');
+                    return;
+                }
+
+                tg.showConfirm(`আপনি BDT ${amount.toFixed(2)} উইথড্র করার অনুরোধ জমা দিতে চান কি?`, (confirmed) => {
                     if (confirmed) {
-                        let newEarnings = parseFloat(localStorage.getItem('earnings')) - amount;
-                        localStorage.setItem('earnings', newEarnings.toString());
+                        // 1. Create the withdrawal request in Firebase for Admin Panel
+                        const withdrawalRef = database.ref('withdrawal_requests').push();
+                        withdrawalRef.set({
+                            userId: userData.id,
+                            userName: userData.first_name,
+                            amount: amount, 
+                            method: document.getElementById('withdraw-method').value,
+                            account: document.getElementById('account-number').value,
+                            date: new Date().toISOString(),
+                            status: 'Pending'
+                        });
                         
+                        // 2. Deduct earnings and save updated user data to Firebase
+                        window.userEarnings -= amount;
+                        saveUserData(window.userEarnings, window.userAdsWatched, window.userReferrals);
+                        
+                        // 3. Optional: Send data to Telegram Bot for notification
                         tg.sendData(JSON.stringify({ 
                             type: 'withdrawal', 
                             amount: amount, 
@@ -639,7 +719,8 @@
                 });
             });
 
-            updateUI();
+            // Start by loading user data from Firebase
+            loadAndSetupUser();
         });
     </script>
 </body>
