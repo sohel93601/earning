@@ -550,11 +550,12 @@
             const startEarningBtn = document.getElementById('start-earning-btn');
             const withdrawBtn = document.getElementById('withdraw-btn');
             const withdrawForm = document.getElementById('withdraw-form');
+            
             // REFERRAL ELEMENTS
             const referralLinkElement = document.getElementById('referral-link');
             const copyReferralBtn = document.getElementById('copy-referral-btn');
             
-            // ✅ Bot username confirmed by user
+            // ✅ CONFIRMED BOT USERNAME
             const BOT_USERNAME = 'Earn_For_USDT_bot'; 
             const referralLinkTemplate = userData.id ? `https://t.me/${BOT_USERNAME}?start=ref_${userData.id}` : 'Link not available. Open through Telegram.';
 
@@ -589,17 +590,19 @@
             function loadAndSetupUser() {
                 if (userData && userData.id) {
                     
-                    // Display the generated referral link
+                    // Display the generated referral link immediately
                     referralLinkElement.textContent = referralLinkTemplate;
                     
+                    // Fetch data from Firebase
                     database.ref('users/' + userData.id).once('value', (snapshot) => {
                         const data = snapshot.val();
                         
                         if (data) {
-                            // Load existing data
+                            // Load existing data, including the totalReferrals updated by the Bot backend
                             window.userEarnings = data.earnings || 0;
                             window.userAdsWatched = data.adsWatched || 0;
-                            window.userReferrals = data.totalReferrals || 0;
+                            // This is the key line: reads the number of referrals from Firebase
+                            window.userReferrals = data.totalReferrals || 0; 
                         } else {
                             // Create new user entry
                             saveUserData(0, 0, 0); 
@@ -622,7 +625,7 @@
 
 
             function updateUI() {
-                // Read from the global variables updated by loadAndSetupUser or rewarded ad
+                // Read from the global variables
                 const earnings = window.userEarnings || 0;
                 const adsWatched = window.userAdsWatched || 0;
                 const referrals = window.userReferrals || 0;
@@ -651,7 +654,7 @@
                 document.getElementById('current-balance').textContent = `BDT ${formattedEarnings}`;
                 document.getElementById('total-earnings').textContent = `BDT ${formattedEarnings}`;
                 document.getElementById('ads-watched').textContent = adsWatched;
-                document.getElementById('total-referrals').textContent = referrals;
+                document.getElementById('total-referrals').textContent = referrals; // <-- Displays the count from Firebase
 
                 // Update Earn Page
                 document.getElementById('ad-progress-text').textContent = `Completed: ${adsWatched} / ${DAILY_ADS_LIMIT}`;
@@ -671,7 +674,7 @@
                 document.getElementById('profile-balance').textContent = `BDT ${formattedEarnings}`;
                 document.getElementById('profile-earnings').textContent = `BDT ${formattedEarnings}`;
                 document.getElementById('profile-ads-watched').textContent = adsWatched;
-                document.getElementById('profile-referrals').textContent = referrals;
+                document.getElementById('profile-referrals').textContent = referrals; // <-- Displays the count from Firebase
             }
 
             function showPage(targetPageId) {
@@ -696,12 +699,10 @@
             copyReferralBtn.addEventListener('click', () => {
                 const link = referralLinkElement.textContent;
                 
-                // Use Telegram's clipboard functionality if available
                 if (tg.isClipboardAvailable) {
                     tg.copyText(link);
                     tg.showAlert('Referral link copied to clipboard!');
                 } else if (navigator.clipboard) {
-                    // Fallback for standard web browser environment
                     navigator.clipboard.writeText(link).then(() => {
                         tg.showAlert('Referral link copied to clipboard!');
                     }).catch(err => {
@@ -749,6 +750,7 @@
                     window.userEarnings += AD_REWARD;
                     window.userAdsWatched += 1;
                     updateUI();
+                    watchAdBtn.disabled = false;
                 }
             });
 
