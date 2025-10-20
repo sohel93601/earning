@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Earning App</title>
+    <!-- Tailwind is NOT used, relying on custom CSS -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -17,6 +18,11 @@
             --text-color: #333333;
             --light-text-color: #888888;
             --border-color: #e0e0e0;
+
+            /* Custom Ad Colors for distinction */
+            --ad-color-interstitial: #f97316; /* Orange */
+            --ad-color-popup: #ef4444; /* Red */
+            --ad-color-inapp: #10b981; /* Teal Green */
         }
 
         body {
@@ -169,6 +175,30 @@
             background-color: var(--primary-color);
             color: #fff;
         }
+        
+        /* Specific Button Styles for Earn Page */
+        .ad-btn-type {
+            margin-top: 0 !important;
+            display: flex;
+            flex-direction: column;
+            padding: 18px 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .ad-btn-type span:first-child {
+            font-size: 18px;
+        }
+
+        .ad-btn-type:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .ad-btn-type:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
 
         .primary-btn:hover {
             background-color: #0056b3;
@@ -259,7 +289,7 @@
             to { opacity: 1; }
         }
         
-        /* Profile & Withdraw Page Styles */
+        /* Profile & Withdraw Page Styles (Existing styles retained) */
         .profile-info, .withdraw-form-container {
             background-color: var(--card-background);
             border-radius: 12px;
@@ -316,7 +346,6 @@
             font-size: 16px;
         }
         
-        /* New style for referral link container */
         .referral-link-container {
             display: flex;
             align-items: center;
@@ -349,6 +378,14 @@
         .copy-btn:hover {
             background-color: #0056b3;
         }
+        /* Style for Ad Status message */
+        #ad-status-message {
+            margin-top: 15px; 
+            font-size: 14px; 
+            color: var(--light-text-color); 
+            min-height: 20px; /* Ensure space is reserved */
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -362,6 +399,7 @@
         </header>
 
         <main class="content">
+            <!-- HOME PAGE -->
             <section id="home-page" class="page active">
                 <div class="card balance-card">
                     <h2 class="card-header">
@@ -402,10 +440,11 @@
                             <span class="material-icons">content_copy</span>
                         </button>
                     </div>
-                    <p style="font-size: 12px; color: var(--light-text-color); margin-top: 10px;">Share this link to invite friends and earn rewards!</p>
+                    <p style="font-size: 12px; color: var(--light-text-color); margin-top: 10px;">Share this link to invite friends and earn **BDT 0.50** per successful referral!</p>
                 </div>
-                </section>
+            </section>
 
+            <!-- EARN PAGE (UPDATED) -->
             <section id="earn-page" class="page">
                 <div class="card">
                     <h2 class="card-header">
@@ -419,13 +458,34 @@
                     <div class="progress-bar-container">
                         <div class="progress-bar" id="ad-progress-bar"></div>
                     </div>
-                    <button class="primary-btn" id="watch-ad-btn">
-                        বিজ্ঞাপন দেখুন ও আয় করুন
-                        <span class="material-icons">play_circle_filled</span>
-                    </button>
+                    
+                    <div id="ad-buttons-container" style="margin-top: 25px; display: grid; gap: 15px;">
+                        <!-- Rewarded Interstitial -->
+                        <button class="primary-btn ad-btn-type" data-ad-type="interstitial" style="background-color: var(--ad-color-interstitial);">
+                            Rewarded Interstitial 
+                            <span style="font-size: 14px; font-weight: 400;" id="reward-interstitial">(BDT 0.500)</span>
+                            <span class="material-icons">play_circle_filled</span>
+                        </button>
+
+                        <!-- Rewarded Popup -->
+                        <button class="primary-btn ad-btn-type" data-ad-type="popup" style="background-color: var(--ad-color-popup);">
+                            Rewarded Popup 
+                            <span style="font-size: 14px; font-weight: 400;" id="reward-popup">(BDT 0.500)</span>
+                            <span class="material-icons">video_library</span>
+                        </button>
+                        
+                        <!-- In-app Interstitial (Impression) -->
+                        <button class="primary-btn ad-btn-type" data-ad-type="inapp" style="background-color: var(--ad-color-inapp);">
+                            In-app Interstitial 
+                            <span style="font-size: 14px; font-weight: 400;" id="reward-inapp">(BDT 0.500)</span>
+                            <span class="material-icons">ad_units</span>
+                        </button>
+                    </div>
+                    <p id="ad-status-message"></p>
                 </div>
             </section>
             
+            <!-- WITHDRAW PAGE -->
             <section id="withdraw-page" class="page">
                 <div class="card">
                     <h2 class="card-header">
@@ -465,6 +525,7 @@
                 </div>
             </section>
 
+            <!-- PROFILE PAGE -->
             <section id="profile-page" class="page">
                 <div class="card" style="padding: 30px;">
                     <div class="profile-pic-container">
@@ -514,13 +575,39 @@
             </div>
         </nav>
     </div>
-
+    
+    <!-- Ad Network SDK Load - Retained from user's code -->
     <script src='//libtl.com/sdk.js' data-zone='9477103' data-sdk='show_9477103'></script>
 
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
+        // --- AD NETWORK SDK SIMULATION (FOR TESTING) ---
+        if (typeof show_9477103 === 'undefined') {
+            console.log('Ad SDK not found. Using dummy functions.');
+            window.show_9477103 = function(config) {
+                if (typeof config === 'object' && config.type === 'inApp') {
+                    console.log('Dummy In-app Interstitial called with capping settings. Returns nothing.');
+                    return;
+                }
+                const adType = config === 'pop' ? 'Rewarded Popup' : 'Rewarded Interstitial';
+                console.log(`Dummy ${adType} called. Returning Promise.`);
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (Math.random() < 0.9) {
+                            console.log(`Dummy ${adType} resolved successfully.`);
+                            resolve();
+                        } else {
+                            console.log(`Dummy ${adType} rejected/closed prematurely.`);
+                            reject(new Error('User closed ad or load failed.'));
+                        }
+                    }, 3000); 
+                });
+            }
+        }
+        
         // 1. Firebase Initialization
         const firebaseConfig = {
             apiKey: "AIzaSyAMVTLS_PK7M4yyMfcdKPHzn8yP1lXxpLQ",
@@ -535,34 +622,67 @@
         
         const database = firebase.database();
 
+        // --- AD & APP CONFIGURATION ---
+        const DAILY_ADS_LIMIT = 50;
+        const MIN_WITHDRAW_AMOUNT = 100;
+        const BOT_USERNAME = 'Earn_For_USDT_bot'; 
+        
+        // NEW CONSTANT FOR REFERRAL REWARD
+        const REFERRAL_REWARD = 0.50; 
+
+        const AD_SETTINGS = {
+            interstitial: {
+                reward: 0.50, // Updated
+                call: () => show_9477103(), 
+                type: 'rewarded_interstitial',
+                name: 'Rewarded Interstitial'
+            },
+            popup: {
+                reward: 0.50, // Updated
+                call: () => show_9477103('pop'), 
+                type: 'rewarded_popup',
+                name: 'Rewarded Popup'
+            },
+            inapp: {
+                reward: 0.50, // Updated
+                call: () => show_9477103({
+                    type: 'inApp',
+                    inAppSettings: {
+                        frequency: 2,
+                        capping: 0.1,
+                        interval: 30,
+                        timeout: 5,
+                        everyPage: false
+                    }
+                }),
+                type: 'inapp_impression',
+                name: 'In-app Interstitial',
+                simulatedTime: 3 
+            }
+        };
+
         // 2. Main App Logic
         document.addEventListener('DOMContentLoaded', () => {
             const tg = window.Telegram.WebApp;
             tg.ready();
             tg.expand();
             
-            // Ensure userData is safe before proceeding
             const userData = tg.initDataUnsafe.user || { id: null }; 
 
             const navItems = document.querySelectorAll('.nav-item');
             const pages = document.querySelectorAll('.page');
-            const watchAdBtn = document.getElementById('watch-ad-btn');
             const startEarningBtn = document.getElementById('start-earning-btn');
             const withdrawBtn = document.getElementById('withdraw-btn');
             const withdrawForm = document.getElementById('withdraw-form');
+            const adButtons = document.querySelectorAll('.ad-btn-type');
+            const adStatusMessage = document.getElementById('ad-status-message');
             
             // REFERRAL ELEMENTS
             const referralLinkElement = document.getElementById('referral-link');
             const copyReferralBtn = document.getElementById('copy-referral-btn');
             
-            // ✅ CONFIRMED BOT USERNAME
-            const BOT_USERNAME = 'Earn_For_USDT_bot'; 
+            // Generate link with 'ref_' start parameter
             const referralLinkTemplate = userData.id ? `https://t.me/${BOT_USERNAME}?start=ref_${userData.id}` : 'Link not available. Open through Telegram.';
-
-
-            const DAILY_ADS_LIMIT = 50;
-            const AD_REWARD = 0.02; // BDT per ad
-            const MIN_WITHDRAW_AMOUNT = 100;
             
             const defaultProfilePic40 = 'https://via.placeholder.com/40';
             const defaultProfilePic80 = 'https://via.placeholder.com/80';
@@ -573,49 +693,100 @@
             window.userReferrals = 0;
 
             // --- Firebase Data Management Functions ---
-            function saveUserData(earnings, adsWatched, referrals) {
+            // Updated to handle the new `referredBy` field
+            function saveUserData(earnings, adsWatched, referrals, referredBy = null) { 
                 if (userData && userData.id) {
-                    database.ref('users/' + userData.id).set({
+                    database.ref('users/' + userData.id).update({
                         id: userData.id,
                         username: userData.username || 'N/A',
                         first_name: userData.first_name || 'N/A',
                         earnings: earnings,
                         adsWatched: adsWatched,
                         totalReferrals: referrals,
+                        referredBy: referredBy, // New field to track who referred this user
                         last_update: new Date().toISOString()
                     });
                 }
             }
             
+            function updateAdRewardTexts() {
+                // Formatting to three decimal places to show the full amount, e.g., 0.500
+                document.getElementById('reward-interstitial').textContent = `(BDT ${AD_SETTINGS.interstitial.reward.toFixed(3)})`;
+                document.getElementById('reward-popup').textContent = `(BDT ${AD_SETTINGS.popup.reward.toFixed(3)})`;
+                document.getElementById('reward-inapp').textContent = `(BDT ${AD_SETTINGS.inapp.reward.toFixed(3)})`;
+            }
+
             function loadAndSetupUser() {
+                updateAdRewardTexts();
+
                 if (userData && userData.id) {
-                    
-                    // Display the generated referral link immediately
                     referralLinkElement.textContent = referralLinkTemplate;
-                    
-                    // Fetch data from Firebase
-                    database.ref('users/' + userData.id).once('value', (snapshot) => {
-                        const data = snapshot.val();
+                    const currentUserId = String(userData.id); // Ensure ID is string for comparison
+
+                    database.ref('users/' + currentUserId).once('value', (snapshot) => {
+                        let data = snapshot.val();
                         
-                        if (data) {
-                            // Load existing data, including the totalReferrals updated by the Bot backend
-                            window.userEarnings = data.earnings || 0;
-                            window.userAdsWatched = data.adsWatched || 0;
-                            // This is the key line: reads the number of referrals from Firebase
-                            window.userReferrals = data.totalReferrals || 0; 
-                        } else {
-                            // Create new user entry
-                            saveUserData(0, 0, 0); 
+                        if (!data) {
+                            // Case 1: Brand new user
+                            data = { earnings: 0, adsWatched: 0, totalReferrals: 0, referredBy: null };
+                            saveUserData(0, 0, 0, null); // Save initial data
                         }
                         
+                        // Set global state from fetched data (or default for new user)
+                        window.userEarnings = data.earnings || 0;
+                        window.userAdsWatched = data.adsWatched || 0;
+                        window.userReferrals = data.totalReferrals || 0;
+                        
+                        // --- REFERRAL COUNTING & REWARD LOGIC: Check for deep link parameter ---
+                        const startParam = tg.initDataUnsafe.start_param;
+                        
+                        // Check 1: Was the user referred via a deep link (e.g., ?start=ref_12345)?
+                        // Check 2: Has the current user already been tracked as referredBy someone?
+                        if (startParam && startParam.startsWith('ref_') && !data.referredBy) {
+                            const referrerId = startParam.substring(4); // Extracts the ID part
+                            
+                            // Check 3: Referrer ID must be valid and not the current user
+                            if (referrerId && referrerId !== currentUserId) {
+                                console.log(`New referral detected! Referrer ID: ${referrerId}`);
+                                
+                                // 1. Update the REFERRER's referral count AND earnings (Transaction for safety)
+                                database.ref('users/' + referrerId).transaction((currentReferrerData) => {
+                                    if (currentReferrerData) {
+                                        // Increment the count
+                                        currentReferrerData.totalReferrals = (currentReferrerData.totalReferrals || 0) + 1;
+                                        // ADD THE REFERRAL REWARD
+                                        currentReferrerData.earnings = (currentReferrerData.earnings || 0) + REFERRAL_REWARD;
+                                    }
+                                    return currentReferrerData;
+                                }, (error, committed, referrerSnapshot) => {
+                                    if (error) {
+                                        console.error("Referrer credit transaction failed:", error);
+                                        // Non-critical, user can still use the app
+                                    } else if (committed) {
+                                        console.log(`Successfully credited referrer ${referrerId}. New count: ${referrerSnapshot.val().totalReferrals}. New Earnings: ${referrerSnapshot.val().earnings}`);
+                                        
+                                        // 2. Mark the CURRENT user as referred to prevent future repeat counts
+                                        database.ref('users/' + currentUserId).update({
+                                            referredBy: referrerId,
+                                        }).then(() => {
+                                            console.log('Current user marked as referred.');
+                                            updateUI(); 
+                                            // Show a success message including the reward amount
+                                            tg.showAlert(`আপনি সফলভাবে রেফারেল প্রোগ্রামে যুক্ত হয়েছেন! রেফারেন্স প্রদানকারী BDT ${REFERRAL_REWARD.toFixed(2)} উপার্জন করেছেন!`); 
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                        // --- END REFERRAL COUNTING & REWARD LOGIC ---
+
                         updateUI();
                     }).catch(error => {
                         console.error("Firebase fetch error:", error);
                         tg.showAlert('Data loading failed. Please check your internet connection.');
-                        updateUI(); // Show default 0.00 if fetch fails
+                        updateUI(); 
                     });
                 } else {
-                    // Fallback for environment without Telegram user data
                     tg.showAlert('Error: Could not retrieve Telegram user ID.');
                     referralLinkElement.textContent = 'User ID not found.';
                     updateUI();
@@ -625,12 +796,23 @@
 
 
             function updateUI() {
-                // Read from the global variables
                 const earnings = window.userEarnings || 0;
                 const adsWatched = window.userAdsWatched || 0;
                 const referrals = window.userReferrals || 0;
 
                 const formattedEarnings = earnings.toFixed(2);
+                
+                // Set Ad buttons disabled state based on limit
+                const isLimitReached = adsWatched >= DAILY_ADS_LIMIT;
+                if (isLimitReached) {
+                    adButtons.forEach(btn => btn.disabled = true);
+                    adStatusMessage.textContent = 'দৈনিক বিজ্ঞাপনের সীমা পৌঁছে গেছে।';
+                    adStatusMessage.style.color = '#ef4444';
+                } else if (!adButtons[0].disabled) {
+                    adStatusMessage.textContent = 'উপার্জন শুরু করার জন্য একটি বিজ্ঞাপনের ধরণ নির্বাচন করুন।';
+                    adStatusMessage.style.color = 'var(--light-text-color)';
+                }
+
 
                 if(userData && userData.id) {
                     const fullName = `${userData.first_name || ''} ${userData.last_name || ''}`.trim();
@@ -639,7 +821,6 @@
                     document.getElementById('profile-user-username').textContent = userData.username ? `@${userData.username}` : 'No username';
                     
                     if (userData.photo_url) {
-                        // Using a simple proxy to bypass potential CORS issues with Telegram photos
                         const proxyUrl = 'https://api.allorigins.win/raw?url=';
                         const proxiedPhotoUrl = `${proxyUrl}${encodeURIComponent(userData.photo_url)}`;
                         document.getElementById('header-profile-pic').src = proxiedPhotoUrl;
@@ -654,27 +835,24 @@
                 document.getElementById('current-balance').textContent = `BDT ${formattedEarnings}`;
                 document.getElementById('total-earnings').textContent = `BDT ${formattedEarnings}`;
                 document.getElementById('ads-watched').textContent = adsWatched;
-                document.getElementById('total-referrals').textContent = referrals; // <-- Displays the count from Firebase
+                document.getElementById('total-referrals').textContent = referrals; 
 
                 // Update Earn Page
                 document.getElementById('ad-progress-text').textContent = `Completed: ${adsWatched} / ${DAILY_ADS_LIMIT}`;
                 const progress = (adsWatched / DAILY_ADS_LIMIT) * 100;
                 document.getElementById('ad-progress-bar').style.width = `${progress}%`;
                 
-                watchAdBtn.disabled = adsWatched >= DAILY_ADS_LIMIT;
-                watchAdBtn.querySelector('span').textContent = adsWatched >= DAILY_ADS_LIMIT ? 'cancel' : 'play_circle_filled';
-                if(adsWatched >= DAILY_ADS_LIMIT) watchAdBtn.childNodes[0].nodeValue = "দৈনিক সীমা পৌঁছে গেছে ";
-
                 // Update Withdraw Page
                 document.getElementById('withdraw-balance-display').textContent = `BDT ${formattedEarnings}`;
                 document.getElementById('submit-withdraw-btn').disabled = earnings < MIN_WITHDRAW_AMOUNT;
                 if(earnings < MIN_WITHDRAW_AMOUNT) document.getElementById('submit-withdraw-btn').textContent = `ন্যূনতম BDT ${MIN_WITHDRAW_AMOUNT} প্রয়োজন`;
+                else document.getElementById('submit-withdraw-btn').textContent = 'Submit Withdraw Request';
 
                 // Update Profile Page
                 document.getElementById('profile-balance').textContent = `BDT ${formattedEarnings}`;
                 document.getElementById('profile-earnings').textContent = `BDT ${formattedEarnings}`;
                 document.getElementById('profile-ads-watched').textContent = adsWatched;
-                document.getElementById('profile-referrals').textContent = referrals; // <-- Displays the count from Firebase
+                document.getElementById('profile-referrals').textContent = referrals; 
             }
 
             function showPage(targetPageId) {
@@ -687,7 +865,94 @@
                 const activePage = document.getElementById(targetPageId);
                 if (activePage) activePage.classList.add('active');
             }
+            
+            function setAdButtonsDisabled(isDisabled, statusText = '') {
+                adButtons.forEach(btn => btn.disabled = isDisabled);
+                adStatusMessage.textContent = statusText;
+                adStatusMessage.style.color = isDisabled ? '#007bff' : 'var(--light-text-color)';
+            }
 
+
+            // --- CORE AD WATCHER AND REWARD FUNCTION ---
+            function watchAd(adType) {
+                if (!userData.id) {
+                    tg.showAlert('Application initialization error: User ID not found.');
+                    return;
+                }
+                if (window.userAdsWatched >= DAILY_ADS_LIMIT) {
+                    tg.showAlert('আপনার দৈনিক বিজ্ঞাপনের সীমা পৌঁছে গেছে।');
+                    return;
+                }
+                
+                const settings = AD_SETTINGS[adType];
+                if (!settings) return;
+
+                // Disable all buttons and show status
+                setAdButtonsDisabled(true, `${settings.name} লোড হচ্ছে...`);
+
+                // --- REWARDED ADS (Interstitial and Popup) ---
+                if (settings.type.startsWith('rewarded')) {
+                    
+                    // The 'call' returns a Promise for rewarded ads
+                    settings.call().then(() => {
+                        // Success: user watched the ad till the end
+                        processEarning(settings, settings.name);
+                    }).catch(e => {
+                        // Failure: ad error or user closed it before completion
+                        console.error(`Ad failed for ${settings.name}:`, e);
+                        tg.showAlert('বিজ্ঞাপনটি দেখাতে সমস্যা হয়েছে অথবা আপনি এটি সম্পূর্ণ দেখেননি। আবার চেষ্টা করুন।');
+                        setAdButtonsDisabled(false, 'বিজ্ঞাপনটি সম্পূর্ণ দেখার চেষ্টা করুন।');
+                        updateUI(); // Update UI to reflect limit status
+                    });
+                } 
+                // --- IN-APP INTERSTITIAL (Impression-based) ---
+                else if (settings.type === 'inapp_impression') {
+                    // 1. Call the function with capping config
+                    settings.call(); 
+
+                    // 2. Simulate the impression time since it's non-rewarded/capping-based
+                    let timeLeft = settings.simulatedTime;
+                    
+                    const interval = setInterval(() => {
+                        if (timeLeft <= 0) {
+                            clearInterval(interval);
+                            // Assume impression registered and reward user
+                            processEarning(settings, settings.name);
+                        } else {
+                            setAdButtonsDisabled(true, `${settings.name} চলছে... বাকি: ${timeLeft} সেকেন্ড।`);
+                            timeLeft--;
+                        }
+                    }, 1000);
+                }
+            }
+
+            function processEarning(settings, adName) {
+                // Ensure data is saved as a transaction to prevent race conditions
+                database.ref('users/' + userData.id).transaction((currentData) => {
+                    if (currentData) {
+                        currentData.earnings = (currentData.earnings || 0) + settings.reward;
+                        currentData.adsWatched = (currentData.adsWatched || 0) + 1;
+                        currentData.last_update = new Date().toISOString();
+                    }
+                    return currentData;
+                }, (error, committed, snapshot) => {
+                    if (error) {
+                        console.error("Earning Transaction Failed:", error);
+                        tg.showAlert("উপার্জন ব্যর্থ হয়েছে। ডাটাবেস ত্রুটি।");
+                    } else if (committed) {
+                        window.userEarnings = snapshot.val().earnings;
+                        window.userAdsWatched = snapshot.val().adsWatched;
+                        tg.showAlert(`${adName} দেখার জন্য আপনি BDT ${settings.reward.toFixed(3)} পেয়েছেন!`);
+                    }
+                    
+                    setAdButtonsDisabled(false, '');
+                    updateUI();
+                });
+            }
+            // --- End Ad Logic ---
+
+
+            // --- Event Listeners ---
             navItems.forEach(item => {
                 item.addEventListener('click', () => showPage(item.getAttribute('data-page')));
             });
@@ -695,7 +960,15 @@
             startEarningBtn.addEventListener('click', () => showPage('earn-page'));
             withdrawBtn.addEventListener('click', () => showPage('withdraw-page'));
             
-            // --- Copy Referral Link Logic ---
+            // Ad Buttons Listener
+            adButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const adType = btn.getAttribute('data-ad-type');
+                    watchAd(adType);
+                });
+            });
+
+            // Copy Referral Link Logic
             copyReferralBtn.addEventListener('click', () => {
                 const link = referralLinkElement.textContent;
                 
@@ -714,47 +987,7 @@
                 }
             });
             
-            // --- Rewarded Ad and Earning Logic ---
-            watchAdBtn.addEventListener('click', () => {
-                if (!userData.id) {
-                    tg.showAlert('Application initialization error: User ID not found.');
-                    return;
-                }
-                if (window.userAdsWatched >= DAILY_ADS_LIMIT) {
-                    tg.showAlert('আপনার দৈনিক বিজ্ঞাপনের সীমা পৌঁছে গেছে।');
-                    return;
-                }
-
-                watchAdBtn.disabled = true;
-
-                if (typeof show_9477103 === 'function') {
-                    show_9477103('pop').then(() => {
-                        // Success: user watched the ad
-                        window.userEarnings += AD_REWARD;
-                        window.userAdsWatched += 1;
-                        
-                        // Save updated data to Firebase
-                        saveUserData(window.userEarnings, window.userAdsWatched, window.userReferrals);
-                        
-                        tg.showAlert(`বিজ্ঞাপনটি দেখার জন্য আপনি BDT ${AD_REWARD.toFixed(2)} পেয়েছেন!`);
-                    }).catch(e => {
-                        // Failure: ad error or user closed it before completion
-                        tg.showAlert('বিজ্ঞাপনটি দেখাতে সমস্যা হয়েছে। অথবা আপনি বিজ্ঞাপনটি সম্পূর্ণ দেখেননি। আবার চেষ্টা করুন।');
-                    }).finally(() => {
-                        watchAdBtn.disabled = false; // Re-enable button after attempt
-                        updateUI();
-                    });
-                } else {
-                    tg.showAlert('Ad SDK not initialized. Running in test mode.');
-                    // Fallback for testing/uninitialized SDK
-                    window.userEarnings += AD_REWARD;
-                    window.userAdsWatched += 1;
-                    updateUI();
-                    watchAdBtn.disabled = false;
-                }
-            });
-
-            // --- Withdrawal Logic ---
+            // Withdrawal Logic (Retained)
             withdrawForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const amount = parseFloat(document.getElementById('withdraw-amount').value);
@@ -767,33 +1000,36 @@
 
                 tg.showConfirm(`আপনি BDT ${amount.toFixed(2)} উইথড্র করার অনুরোধ জমা দিতে চান কি?`, (confirmed) => {
                     if (confirmed) {
-                        // 1. Create the withdrawal request in Firebase for Admin Panel
-                        const withdrawalRef = database.ref('withdrawal_requests').push();
-                        withdrawalRef.set({
-                            userId: userData.id,
-                            userName: userData.first_name,
-                            amount: amount, 
-                            method: document.getElementById('withdraw-method').value,
-                            account: document.getElementById('account-number').value,
-                            date: new Date().toISOString(),
-                            status: 'Pending'
+                        // 1. Deduct amount via transaction
+                        database.ref('users/' + userData.id + '/earnings').transaction((currentEarnings) => {
+                            if (currentEarnings >= amount) {
+                                return currentEarnings - amount;
+                            }
+                            return undefined;
+                        }, (error, committed, snapshot) => {
+                            if (error || !committed) {
+                                tg.showAlert('উইথড্রয়াল প্রক্রিয়া করতে ব্যর্থ হয়েছে। ডাটাবেস ত্রুটি বা অপর্যাপ্ত ব্যালেন্স।');
+                                return;
+                            }
+                            
+                            // 2. Deduction successful, create request for Admin Panel
+                            const withdrawalRef = database.ref('withdrawal_requests').push();
+                            withdrawalRef.set({
+                                userId: userData.id,
+                                userName: userData.first_name,
+                                amount: amount, 
+                                method: document.getElementById('withdraw-method').value,
+                                account: document.getElementById('account-number').value,
+                                date: new Date().toISOString(),
+                                status: 'Pending'
+                            });
+                            
+                            window.userEarnings = snapshot.val(); // Update global state from transaction result
+                            
+                            withdrawForm.reset();
+                            updateUI();
+                            tg.showAlert('আপনার উইথড্র অনুরোধ সফলভাবে জমা হয়েছে।');
                         });
-                        
-                        // 2. Deduct earnings and save updated user data to Firebase
-                        window.userEarnings -= amount;
-                        saveUserData(window.userEarnings, window.userAdsWatched, window.userReferrals);
-                        
-                        // 3. Optional: Send data to Telegram Bot for notification
-                        tg.sendData(JSON.stringify({ 
-                            type: 'withdrawal', 
-                            amount: amount, 
-                            method: document.getElementById('withdraw-method').value,
-                            account: document.getElementById('account-number').value
-                        }));
-                        
-                        withdrawForm.reset();
-                        updateUI();
-                        tg.showAlert('আপনার উইথড্র অনুরোধ সফলভাবে জমা হয়েছে।');
                     }
                 });
             });
@@ -804,3 +1040,4 @@
     </script>
 </body>
 </html>
+
