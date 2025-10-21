@@ -8,10 +8,9 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
 
     <style>
-    .telegram-float {
+  .telegram-float {
       position: fixed;
       bottom: 80px;
       right: 20px;
@@ -44,6 +43,7 @@
       0% { transform: scale(0); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
+
         :root {
             --primary-color: #007bff;
             --secondary-color: #28a745;
@@ -423,7 +423,7 @@
     </style>
 </head>
 <body>
-      <!-- Telegram Floating Button -->
+  <!-- Telegram Floating Button -->
     <div class="telegram-float" id="telegramBtn">
     <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
   </div>
@@ -442,35 +442,35 @@
                 <div class="card balance-card">
                     <h2 class="card-header">
                         <span class="material-icons">account_balance_wallet</span>
-                        My Balance
+                        My Balance (আমার ব্যালেন্স)
                     </h2>
                     <div class="balance" id="current-balance">BDT 0.00</div>
                     <button class="primary-btn" id="start-earning-btn">
-                        Start Earning Now <span class="material-icons">arrow_forward</span>
+                        Start Earning Now (ইনকাম শুরু করুন) <span class="material-icons">arrow_forward</span>
                     </button>
                     <button class="secondary-btn" id="withdraw-btn">
-                        Withdraw <span class="material-icons">currency_exchange</span>
+                        Withdraw (উইথড্র) <span class="material-icons">currency_exchange</span>
                     </button>
                 </div>
                 <div class="dashboard-grid">
                     <div class="dashboard-item">
                         <span class="material-icons" style="color: var(--secondary-color);">attach_money</span>
                         <div class="dashboard-item-value" id="total-earnings">BDT 0.00</div>
-                        <div class="dashboard-item-label">Total Earnings</div>
+                        <div class="dashboard-item-label">Total Earnings (মোট উপার্জন)</div>
                     </div>
                     <div class="dashboard-item">
                         <span class="material-icons" style="color: #ffc107;">visibility</span>
                         <div class="dashboard-item-value" id="ads-watched">0</div>
-                        <div class="dashboard-item-label">Ads Watched</div>
+                        <div class="dashboard-item-label">Ads Watched (বিজ্ঞাপন দেখা হয়েছে)</div>
                     </div>
                 </div>
                 <div class="card" style="margin-top: 20px;">
                     <div class="card-header">
                         <span class="material-icons">group_add</span>
-                        Invite & Earn
+                        Invite & Earn (আমন্ত্রণ করুন ও উপার্জন করুন)
                     </div>
                     <div class="dashboard-item-value" id="total-referrals">0</div>
-                    <div class="dashboard-item-label">Total Referrals</div>
+                    <div class="dashboard-item-label">Total Referrals (মোট রেফারেল)</div>
                     
                     <div class="referral-link-container">
                         <div class="referral-link-text" id="referral-link">Loading link...</div>
@@ -478,7 +478,9 @@
                             <span class="material-icons">content_copy</span>
                         </button>
                     </div>
-                    <p style="font-size: 12px; color: var(--light-text-color); margin-top: 10px;">Share this link to invite friends and earn **BDT 0.50** per successful referral!</p>
+                    <p style="font-size: 12px; color: var(--light-text-color); margin-top: 10px;" id="referral-reward-text">
+                        ☛Share this link to invite friends and earn **10% commission** per successful referral!
+                    </p>
                 </div>
             </section>
 
@@ -487,7 +489,7 @@
                 <div class="card">
                     <h2 class="card-header">
                         <span class="material-icons">monetization_on</span>
-                        Earn Rewards
+                        Earn Rewards (পুরস্কার উপার্জন)
                     </h2>
                     <div style="text-align: left; margin-bottom: 10px;">
                         <div style="font-size: 14px; font-weight: 600;">Today's Progress:</div>
@@ -528,12 +530,12 @@
                 <div class="card">
                     <h2 class="card-header">
                         <span class="material-icons">currency_exchange</span>
-                        Withdraw Your Earnings
+                        Withdraw Your Earnings (উইথড্র করুন)
                     </h2>
                     <div class="balance" id="withdraw-balance-display">BDT 0.00</div>
-                    <div class="card-label">Current Balance</div>
+                    <div class="card-label">Current Balance (বর্তমান ব্যালেন্স)</div>
                     <div style="margin-top: 20px; font-size: 14px; color: var(--light-text-color);">
-                        Minimum withdraw amount is BDT 100.00
+                        Minimum withdraw amount is BDT 100.00 (সর্বনিম্ন উইথড্র)
                     </div>
                 </div>
                 
@@ -541,15 +543,15 @@
                     <h4 style="margin-top: 0; text-align: left;">Withdraw Details</h4>
                     <form id="withdraw-form">
                         <div class="form-group">
-                            <label for="withdraw-method">Withdraw Method</label>
+                            <label for="withdraw-method">Withdraw Method (পদ্ধতি)</label>
                             <select id="withdraw-method" required>
-                                <option value="" disabled selected>Select a method</option>
+                                <option value="" disabled selected>Select a method (পদ্ধতি নির্বাচন করুন)</option>
                                 <option value="bkash">bKash</option>
                                 <option value="binance">Binance</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="account-number">Account Number</label>
+                            <label for="account-number">Account Number (অ্যাকাউন্ট নম্বর)</label>
                             <input type="text" id="account-number" placeholder="Enter bKash/Binance account number" required>
                         </div>
                         <div class="form-group">
@@ -557,7 +559,7 @@
                             <input type="number" id="withdraw-amount" placeholder="Enter amount to withdraw" required min="100">
                         </div>
                         <button type="submit" class="primary-btn" id="submit-withdraw-btn">
-                            Submit Withdraw Request
+                            Submit Withdraw Request (উইথড্র অনুরোধ জমা দিন)
                         </button>
                     </form>
                 </div>
@@ -573,7 +575,7 @@
                     <p id="profile-user-username" style="margin: 5px 0 0; color: var(--light-text-color); font-size: 14px;">@telegram</p>
                 </div>
                 <div class="profile-info">
-                    <h4 style="margin-top: 0; text-align:left;">My Profile</h4>
+                    <h4 style="margin-top: 0; text-align:left;">My Profile (আমার প্রোফাইল)</h4>
                     <div class="profile-info-row">
                         <span class="profile-label">Current Balance</span>
                         <span class="profile-value" id="profile-balance">BDT 0.00</span>
@@ -622,7 +624,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
-    // JavaScript for click event
+  // JavaScript for click event
     document.getElementById("telegramBtn").addEventListener("click", function() {
       window.open("https://t.me/SKCompany2024", "_blank");
     });
@@ -669,24 +671,26 @@
         const MIN_WITHDRAW_AMOUNT = 100;
         const BOT_USERNAME = 'Earn_For_USDT_bot'; 
         
-        // NEW CONSTANT FOR REFERRAL REWARD
-        const REFERRAL_REWARD = 0.50; 
+        // NEW COMMISSION LOGIC: 10% of the base ad reward
+        const AD_REWARD_BASE = 0.50; // The standard reward for watching an ad
+        const REFERRAL_COMMISSION_PERCENT = 0.10; // 10% commission requested by user
+        const REFERRAL_REWARD = AD_REWARD_BASE * REFERRAL_COMMISSION_PERCENT; // Calculated BDT 0.05
 
         const AD_SETTINGS = {
             interstitial: {
-                reward: 0.50, // Updated
+                reward: AD_REWARD_BASE,
                 call: () => show_9477103(), 
                 type: 'rewarded_interstitial',
                 name: 'Rewarded Interstitial'
             },
             popup: {
-                reward: 0.50, // Updated
+                reward: AD_REWARD_BASE,
                 call: () => show_9477103('pop'), 
                 type: 'rewarded_popup',
                 name: 'Rewarded Popup'
             },
             inapp: {
-                reward: 0.50, // Updated
+                reward: AD_REWARD_BASE,
                 call: () => show_9477103({
                     type: 'inApp',
                     inAppSettings: {
@@ -722,6 +726,7 @@
             // REFERRAL ELEMENTS
             const referralLinkElement = document.getElementById('referral-link');
             const copyReferralBtn = document.getElementById('copy-referral-btn');
+            const referralRewardText = document.getElementById('referral-reward-text');
             
             // Generate link with 'ref_' start parameter
             const referralLinkTemplate = userData.id ? `https://t.me/${BOT_USERNAME}?start=ref_${userData.id}` : 'Link not available. Open through Telegram.';
@@ -735,7 +740,6 @@
             window.userReferrals = 0;
 
             // --- Firebase Data Management Functions ---
-            // Updated to handle the new `referredBy` field
             function saveUserData(earnings, adsWatched, referrals, referredBy = null) { 
                 if (userData && userData.id) {
                     database.ref('users/' + userData.id).update({
@@ -745,7 +749,7 @@
                         earnings: earnings,
                         adsWatched: adsWatched,
                         totalReferrals: referrals,
-                        referredBy: referredBy, // New field to track who referred this user
+                        referredBy: referredBy, // Field to track who referred this user
                         last_update: new Date().toISOString()
                     });
                 }
@@ -756,6 +760,9 @@
                 document.getElementById('reward-interstitial').textContent = `(BDT ${AD_SETTINGS.interstitial.reward.toFixed(3)})`;
                 document.getElementById('reward-popup').textContent = `(BDT ${AD_SETTINGS.popup.reward.toFixed(3)})`;
                 document.getElementById('reward-inapp').textContent = `(BDT ${AD_SETTINGS.inapp.reward.toFixed(3)})`;
+                
+                // Update referral text with calculated commission
+                referralRewardText.innerHTML = `বন্ধুদের আমন্ত্রণ জানাতে এই লিঙ্কটি শেয়ার করুন এবং প্রতি সফল রেফারেলের জন্য **${(REFERRAL_COMMISSION_PERCENT * 100).toFixed(0)}% কমিশন (BDT ${REFERRAL_REWARD.toFixed(2)})** উপার্জন করুন!`;
             }
 
             function loadAndSetupUser() {
@@ -765,13 +772,14 @@
                     referralLinkElement.textContent = referralLinkTemplate;
                     const currentUserId = String(userData.id); // Ensure ID is string for comparison
 
-                    database.ref('users/' + currentUserId).once('value', (snapshot) => {
+                    // BUG FIX: Change from once('value') to on('value') for real-time updates
+                    database.ref('users/' + currentUserId).on('value', (snapshot) => {
                         let data = snapshot.val();
                         
                         if (!data) {
                             // Case 1: Brand new user
                             data = { earnings: 0, adsWatched: 0, totalReferrals: 0, referredBy: null };
-                            saveUserData(0, 0, 0, null); // Save initial data
+                            // Initial save will happen below if referral is processed, otherwise save here.
                         }
                         
                         // Set global state from fetched data (or default for new user)
@@ -796,37 +804,46 @@
                                     if (currentReferrerData) {
                                         // Increment the count
                                         currentReferrerData.totalReferrals = (currentReferrerData.totalReferrals || 0) + 1;
-                                        // ADD THE REFERRAL REWARD
+                                        // ADD THE CALCULATED REFERRAL COMMISSION (10% of AD_REWARD_BASE)
                                         currentReferrerData.earnings = (currentReferrerData.earnings || 0) + REFERRAL_REWARD;
                                     }
                                     return currentReferrerData;
                                 }, (error, committed, referrerSnapshot) => {
                                     if (error) {
                                         console.error("Referrer credit transaction failed:", error);
-                                        // Non-critical, user can still use the app
+                                        tg.showAlert('রেফারেল ক্রেডিট দেওয়া সম্ভব হয়নি।');
                                     } else if (committed) {
-                                        console.log(`Successfully credited referrer ${referrerId}. New count: ${referrerSnapshot.val().totalReferrals}. New Earnings: ${referrerSnapshot.val().earnings}`);
+                                        console.log(`Successfully credited referrer ${referrerId}. New Earnings: ${referrerSnapshot.val().earnings}`);
                                         
                                         // 2. Mark the CURRENT user as referred to prevent future repeat counts
                                         database.ref('users/' + currentUserId).update({
                                             referredBy: referrerId,
+                                            // Initialize other user data if it was null
+                                            earnings: data.earnings || 0,
+                                            adsWatched: data.adsWatched || 0,
+                                            totalReferrals: data.totalReferrals || 0
                                         }).then(() => {
                                             console.log('Current user marked as referred.');
-                                            updateUI(); 
+                                            // Since we use on('value'), updateUI() will be called automatically when the database confirms the current user's update.
                                             // Show a success message including the reward amount
-                                            tg.showAlert(`আপনি সফলভাবে রেফারেল প্রোগ্রামে যুক্ত হয়েছেন! রেফারেন্স প্রদানকারী BDT ${REFERRAL_REWARD.toFixed(2)} উপার্জন করেছেন!`); 
+                                            tg.showAlert(`আপনি সফলভাবে রেফারেল প্রোগ্রামে যুক্ত হয়েছেন! রেফারেন্স প্রদানকারী BDT ${REFERRAL_REWARD.toFixed(2)} কমিশন পেয়েছেন!`); 
                                         });
                                     }
                                 });
                             }
+                        } else {
+                            // If user is not referred or referredBy is already set, just ensure data is saved
+                            if (!snapshot.exists()) {
+                                saveUserData(0, 0, 0, null); 
+                            }
                         }
-                        // --- END REFERRAL COUNTING & REWARD LOGIC ---
-
-                        updateUI();
-                    }).catch(error => {
-                        console.error("Firebase fetch error:", error);
-                        tg.showAlert('Data loading failed. Please check your internet connection.');
+                        
+                        // This call happens every time on('value') triggers, ensuring real-time UI updates
                         updateUI(); 
+                    }, (error) => {
+                         console.error("Firebase subscription error:", error);
+                         tg.showAlert('ডেটা লোড করতে সমস্যা হচ্ছে। আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন।');
+                         updateUI(); 
                     });
                 } else {
                     tg.showAlert('Error: Could not retrieve Telegram user ID.');
@@ -982,7 +999,8 @@
                         console.error("Earning Transaction Failed:", error);
                         tg.showAlert("উপার্জন ব্যর্থ হয়েছে। ডাটাবেস ত্রুটি।");
                     } else if (committed) {
-                        window.userEarnings = snapshot.val().earnings;
+                        // The on('value') listener automatically updates window.userEarnings and calls updateUI()
+                        window.userEarnings = snapshot.val().earnings; 
                         window.userAdsWatched = snapshot.val().adsWatched;
                         tg.showAlert(`${adName} দেখার জন্য আপনি BDT ${settings.reward.toFixed(3)} পেয়েছেন!`);
                     }
@@ -1016,16 +1034,16 @@
                 
                 if (tg.isClipboardAvailable) {
                     tg.copyText(link);
-                    tg.showAlert('Referral link copied to clipboard!');
+                    tg.showAlert('রেফারেল লিঙ্ক ক্লিপবোর্ডে কপি করা হয়েছে!');
                 } else if (navigator.clipboard) {
                     navigator.clipboard.writeText(link).then(() => {
-                        tg.showAlert('Referral link copied to clipboard!');
+                        tg.showAlert('রেফারেল লিঙ্ক ক্লিপবোর্ডে কপি করা হয়েছে!');
                     }).catch(err => {
                         console.error('Could not copy text: ', err);
-                        tg.showAlert('Could not copy link. Please manually copy: ' + link);
+                        tg.showAlert('লিঙ্কটি কপি করা সম্ভব হয়নি। ম্যানুয়ালি কপি করুন: ' + link);
                     });
                 } else {
-                    tg.showAlert('Please manually copy the link: ' + link);
+                    tg.showAlert('লিঙ্কটি ম্যানুয়ালি কপি করুন: ' + link);
                 }
             });
             
