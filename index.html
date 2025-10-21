@@ -8,8 +8,42 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
 
     <style>
+    .telegram-float {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      background-color: #00ff00;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      cursor: pointer;
+      z-index: 9999;
+      transition: transform 0.3s ease;
+      animation: popUp 0.8s ease;
+    }
+
+    .telegram-float img {
+      width: 58px;
+      height: 58px;
+      filter: invert(100%);
+    }
+
+    .telegram-float:hover {
+      transform: scale(1.1);
+      background-color: #00ff00;
+    }
+
+    @keyframes popUp {
+      0% { transform: scale(0); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
         :root {
             --primary-color: #007bff;
             --secondary-color: #28a745;
@@ -389,6 +423,10 @@
     </style>
 </head>
 <body>
+      <!-- Telegram Floating Button -->
+    <div class="telegram-float" id="telegramBtn">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
+  </div>
     <div class="container">
         <header class="header">
             <img id="header-profile-pic" src="https://via.placeholder.com/40" alt="Profile" class="header-profile-pic" onerror="this.src='https://via.placeholder.com/40';">
@@ -584,6 +622,10 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
+    // JavaScript for click event
+    document.getElementById("telegramBtn").addEventListener("click", function() {
+      window.open("https://t.me/SKCompany2024", "_blank");
+    });
         // --- AD NETWORK SDK SIMULATION (FOR TESTING) ---
         if (typeof show_9477103 === 'undefined') {
             console.log('Ad SDK not found. Using dummy functions.');
