@@ -10,7 +10,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
-  .telegram-float {
+        .telegram-float {
       position: fixed;
       bottom: 80px;
       right: 20px;
@@ -423,10 +423,6 @@
     </style>
 </head>
 <body>
-  <!-- Telegram Floating Button -->
-    <div class="telegram-float" id="telegramBtn">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
-  </div>
     <div class="container">
         <header class="header">
             <img id="header-profile-pic" src="https://via.placeholder.com/40" alt="Profile" class="header-profile-pic" onerror="this.src='https://via.placeholder.com/40';">
@@ -435,7 +431,10 @@
                 <p>Welcome to the Earning App!</p>
             </div>
         </header>
-
+<!-- Telegram Floating Button -->
+    <div class="telegram-float" id="telegramBtn">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
+    </div>
         <main class="content">
             <!-- HOME PAGE -->
             <section id="home-page" class="page active">
@@ -479,7 +478,7 @@
                         </button>
                     </div>
                     <p style="font-size: 12px; color: var(--light-text-color); margin-top: 10px;" id="referral-reward-text">
-                        ☛Share this link to invite friends and earn **10% commission** per successful referral!
+                        Share this link to invite friends and earn **10% commission** per successful referral!
                     </p>
                 </div>
             </section>
@@ -615,7 +614,7 @@
             </div>
         </nav>
     </div>
-    
+     
     <!-- Ad Network SDK Load - Retained from user's code -->
     <script src='//libtl.com/sdk.js' data-zone='9477103' data-sdk='show_9477103'></script>
 
@@ -624,10 +623,11 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
-  // JavaScript for click event
+ // JavaScript for click event
     document.getElementById("telegramBtn").addEventListener("click", function() {
       window.open("https://t.me/SKCompany2024", "_blank");
     });
+
         // --- AD NETWORK SDK SIMULATION (FOR TESTING) ---
         if (typeof show_9477103 === 'undefined') {
             console.log('Ad SDK not found. Using dummy functions.');
@@ -669,6 +669,8 @@
         // --- AD & APP CONFIGURATION ---
         const DAILY_ADS_LIMIT = 50;
         const MIN_WITHDRAW_AMOUNT = 100;
+        
+        // BOT_USERNAME updated to match the user's provided link structure
         const BOT_USERNAME = 'Earn_For_USDT_bot'; 
         
         // NEW COMMISSION LOGIC: 10% of the base ad reward
@@ -728,8 +730,11 @@
             const copyReferralBtn = document.getElementById('copy-referral-btn');
             const referralRewardText = document.getElementById('referral-reward-text');
             
-            // Generate link with 'ref_' start parameter
-            const referralLinkTemplate = userData.id ? `https://t.me/${BOT_USERNAME}?start=ref_${userData.id}` : 'Link not available. Open through Telegram.';
+            // --- UPDATED LINK GENERATION using the user's requested format: /app?startapp=<USER_ID> ---
+            const referralLinkTemplate = userData.id 
+                ? `https://t.me/${BOT_USERNAME}/app?startapp=${userData.id}` 
+                : 'Link not available. Open through Telegram.';
+            // -----------------------------------------------------------------------------------------
             
             const defaultProfilePic40 = 'https://via.placeholder.com/40';
             const defaultProfilePic80 = 'https://via.placeholder.com/80';
@@ -790,13 +795,14 @@
                         // --- REFERRAL COUNTING & REWARD LOGIC: Check for deep link parameter ---
                         const startParam = tg.initDataUnsafe.start_param;
                         
-                        // Check 1: Was the user referred via a deep link (e.g., ?start=ref_12345)?
-                        // Check 2: Has the current user already been tracked as referredBy someone?
-                        if (startParam && startParam.startsWith('ref_') && !data.referredBy) {
-                            const referrerId = startParam.substring(4); // Extracts the ID part
+                        // Check if startParam exists, is a numeric ID string, and the user hasn't been referred yet
+                        const isNumericId = /^\d+$/.test(startParam); // Checks if startParam is purely digits
+                        
+                        if (isNumericId && !data.referredBy) {
+                            const referrerId = startParam; 
                             
                             // Check 3: Referrer ID must be valid and not the current user
-                            if (referrerId && referrerId !== currentUserId) {
+                            if (referrerId !== currentUserId) {
                                 console.log(`New referral detected! Referrer ID: ${referrerId}`);
                                 
                                 // 1. Update the REFERRER's referral count AND earnings (Transaction for safety)
@@ -824,7 +830,6 @@
                                             totalReferrals: data.totalReferrals || 0
                                         }).then(() => {
                                             console.log('Current user marked as referred.');
-                                            // Since we use on('value'), updateUI() will be called automatically when the database confirms the current user's update.
                                             // Show a success message including the reward amount
                                             tg.showAlert(`আপনি সফলভাবে রেফারেল প্রোগ্রামে যুক্ত হয়েছেন! রেফারেন্স প্রদানকারী BDT ${REFERRAL_REWARD.toFixed(2)} কমিশন পেয়েছেন!`); 
                                         });
