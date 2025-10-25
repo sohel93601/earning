@@ -10,7 +10,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
-        .telegram-float {
+    .telegram-float {
       position: fixed;
       bottom: 80px;
       right: 20px;
@@ -43,6 +43,7 @@
       0% { transform: scale(0); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
+
 
         :root {
             --primary-color: #007bff;
@@ -420,9 +421,18 @@
             min-height: 20px; /* Ensure space is reserved */
             font-weight: 500;
         }
+        
+        #input-referral-code:disabled {
+            background-color: #f0f0f0;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
+    <!-- Telegram Floating Button -->
+    <div class="telegram-float" id="telegramBtn">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
+  </div>
     <div class="container">
         <header class="header">
             <img id="header-profile-pic" src="https://via.placeholder.com/40" alt="Profile" class="header-profile-pic" onerror="this.src='https://via.placeholder.com/40';">
@@ -431,10 +441,7 @@
                 <p>Welcome to the Earning App!</p>
             </div>
         </header>
-<!-- Telegram Floating Button -->
-    <div class="telegram-float" id="telegramBtn">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
-    </div>
+
         <main class="content">
             <!-- HOME PAGE -->
             <section id="home-page" class="page active">
@@ -463,14 +470,22 @@
                         <div class="dashboard-item-label">Ads Watched (বিজ্ঞাপন দেখা হয়েছে)</div>
                     </div>
                 </div>
+                
+                <!-- UPDATED REFERRAL CARD -->
                 <div class="card" style="margin-top: 20px;">
                     <div class="card-header">
                         <span class="material-icons">group_add</span>
                         Invite & Earn (আমন্ত্রণ করুন ও উপার্জন করুন)
                     </div>
-                    <div class="dashboard-item-value" id="total-referrals">0</div>
-                    <div class="dashboard-item-label">Total Referrals (মোট রেফারেল)</div>
                     
+                    <!-- 1. User's own Code Display -->
+                    <div class="card-label" style="font-weight: 600; margin-bottom: 5px;">Your Code (আপনার কোড)</div>
+                    <div class="dashboard-item-value" id="user-referral-code" style="font-size: 28px; color: var(--primary-color);">...</div>
+                    <div class="dashboard-item-label" style="margin-top: 10px;">Total Referrals (মোট রেফারেল): <span id="total-referrals">0</span></div>
+
+
+                    <!-- 2. Share Link Section -->
+                    <h4 style="text-align: left; margin: 20px 0 10px; font-weight: 600;">Share Link (লিঙ্ক শেয়ার করুন)</h4>
                     <div class="referral-link-container">
                         <div class="referral-link-text" id="referral-link">Loading link...</div>
                         <button class="copy-btn" id="copy-referral-btn">
@@ -478,9 +493,25 @@
                         </button>
                     </div>
                     <p style="font-size: 12px; color: var(--light-text-color); margin-top: 10px;" id="referral-reward-text">
-                        Share this link to invite friends and earn **10% commission** per successful referral!
+                        Share this link to invite friends and earn commission!
                     </p>
+                    
+                    <!-- 3. Use Referral Code Section -->
+                    <h4 style="text-align: left; margin: 20px 0 10px; font-weight: 600;">Connect with a Code (কোড দিয়ে সংযুক্ত করুন)</h4>
+                    <div id="connect-code-section">
+                        <form id="referral-code-form">
+                            <div class="form-group" style="margin-bottom: 10px;">
+                                <input type="number" id="input-referral-code" placeholder="Enter Referral Code (রেফারেল কোড দিন)" required>
+                            </div>
+                            <button type="submit" class="primary-btn" id="submit-referral-code-btn" style="margin-top: 0;">
+                                Connect (সংযুক্ত করুন)
+                            </button>
+                        </form>
+                    </div>
+                    <p id="referral-lock-message" style="font-size: 14px; color: #ef4444; font-weight: 500; min-height: 20px;"></p>
                 </div>
+                <!-- END UPDATED REFERRAL CARD -->
+
             </section>
 
             <!-- EARN PAGE (UPDATED) -->
@@ -614,7 +645,7 @@
             </div>
         </nav>
     </div>
-     
+   
     <!-- Ad Network SDK Load - Retained from user's code -->
     <script src='//libtl.com/sdk.js' data-zone='9477103' data-sdk='show_9477103'></script>
 
@@ -623,11 +654,10 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <script>
- // JavaScript for click event
+     // JavaScript for click event
     document.getElementById("telegramBtn").addEventListener("click", function() {
       window.open("https://t.me/SKCompany2024", "_blank");
     });
-
         // --- AD NETWORK SDK SIMULATION (FOR TESTING) ---
         if (typeof show_9477103 === 'undefined') {
             console.log('Ad SDK not found. Using dummy functions.');
@@ -716,6 +746,9 @@
             tg.expand();
             
             const userData = tg.initDataUnsafe.user || { id: null }; 
+            
+            // Function to get current date in YYYY-MM-DD format
+            const getTodayDate = () => new Date().toISOString().split('T')[0];
 
             const navItems = document.querySelectorAll('.nav-item');
             const pages = document.querySelectorAll('.page');
@@ -729,12 +762,17 @@
             const referralLinkElement = document.getElementById('referral-link');
             const copyReferralBtn = document.getElementById('copy-referral-btn');
             const referralRewardText = document.getElementById('referral-reward-text');
+            const userReferralCodeElement = document.getElementById('user-referral-code');
+            const referralCodeForm = document.getElementById('referral-code-form');
+            const inputReferralCode = document.getElementById('input-referral-code');
+            const submitReferralCodeBtn = document.getElementById('submit-referral-code-btn');
+            const referralLockMessage = document.getElementById('referral-lock-message');
             
-            // --- UPDATED LINK GENERATION using the user's requested format: /app?startapp=<USER_ID> ---
+            // --- LINK GENERATION ---
             const referralLinkTemplate = userData.id 
                 ? `https://t.me/${BOT_USERNAME}/app?startapp=${userData.id}` 
                 : 'Link not available. Open through Telegram.';
-            // -----------------------------------------------------------------------------------------
+            // -------------------------
             
             const defaultProfilePic40 = 'https://via.placeholder.com/40';
             const defaultProfilePic80 = 'https://via.placeholder.com/80';
@@ -743,9 +781,11 @@
             window.userEarnings = 0;
             window.userAdsWatched = 0;
             window.userReferrals = 0;
+            window.userReferredBy = null; // Track who referred this user
 
             // --- Firebase Data Management Functions ---
-            function saveUserData(earnings, adsWatched, referrals, referredBy = null) { 
+            // Updated function to include lastAdDate
+            function saveUserData(earnings, adsWatched, referrals, referredBy = null, lastAdDate = getTodayDate()) { 
                 if (userData && userData.id) {
                     database.ref('users/' + userData.id).update({
                         id: userData.id,
@@ -754,7 +794,8 @@
                         earnings: earnings,
                         adsWatched: adsWatched,
                         totalReferrals: referrals,
-                        referredBy: referredBy, // Field to track who referred this user
+                        referredBy: referredBy, 
+                        lastAdDate: lastAdDate, // NEW: Field to track last active date for daily reset
                         last_update: new Date().toISOString()
                     });
                 }
@@ -775,75 +816,39 @@
 
                 if (userData && userData.id) {
                     referralLinkElement.textContent = referralLinkTemplate;
-                    const currentUserId = String(userData.id); // Ensure ID is string for comparison
+                    userReferralCodeElement.textContent = userData.id; // Display user's own code
 
-                    // BUG FIX: Change from once('value') to on('value') for real-time updates
+                    const currentUserId = String(userData.id); 
+
+                    // Listen for real-time updates for the current user
                     database.ref('users/' + currentUserId).on('value', (snapshot) => {
                         let data = snapshot.val();
                         
                         if (!data) {
-                            // Case 1: Brand new user
-                            data = { earnings: 0, adsWatched: 0, totalReferrals: 0, referredBy: null };
-                            // Initial save will happen below if referral is processed, otherwise save here.
+                            // Case 1: Brand new user - initialize data
+                            data = { earnings: 0, adsWatched: 0, totalReferrals: 0, referredBy: null, lastAdDate: getTodayDate() };
+                            saveUserData(0, 0, 0, null, getTodayDate()); 
                         }
                         
-                        // Set global state from fetched data (or default for new user)
+                        // --- Daily Reset Logic ---
+                        const today = getTodayDate();
+                        const lastAdDate = data.lastAdDate || today; // Default to today if not set
+
+                        if (lastAdDate !== today) {
+                            // It's a new day, reset ads watched
+                            console.log("New day detected. Resetting ads watched to 0.");
+                            data.adsWatched = 0;
+                            // Update Firebase immediately with reset data and new date
+                            saveUserData(data.earnings, 0, data.totalReferrals, data.referredBy, today); 
+                            // Firebase listener will trigger again, but setting locally for smoothness
+                        }
+                        
+                        // Set global state from fetched (and potentially reset) data
                         window.userEarnings = data.earnings || 0;
                         window.userAdsWatched = data.adsWatched || 0;
                         window.userReferrals = data.totalReferrals || 0;
+                        window.userReferredBy = data.referredBy || null; // Capture referredBy status
                         
-                        // --- REFERRAL COUNTING & REWARD LOGIC: Check for deep link parameter ---
-                        const startParam = tg.initDataUnsafe.start_param;
-                        
-                        // Check if startParam exists, is a numeric ID string, and the user hasn't been referred yet
-                        const isNumericId = /^\d+$/.test(startParam); // Checks if startParam is purely digits
-                        
-                        if (isNumericId && !data.referredBy) {
-                            const referrerId = startParam; 
-                            
-                            // Check 3: Referrer ID must be valid and not the current user
-                            if (referrerId !== currentUserId) {
-                                console.log(`New referral detected! Referrer ID: ${referrerId}`);
-                                
-                                // 1. Update the REFERRER's referral count AND earnings (Transaction for safety)
-                                database.ref('users/' + referrerId).transaction((currentReferrerData) => {
-                                    if (currentReferrerData) {
-                                        // Increment the count
-                                        currentReferrerData.totalReferrals = (currentReferrerData.totalReferrals || 0) + 1;
-                                        // ADD THE CALCULATED REFERRAL COMMISSION (10% of AD_REWARD_BASE)
-                                        currentReferrerData.earnings = (currentReferrerData.earnings || 0) + REFERRAL_REWARD;
-                                    }
-                                    return currentReferrerData;
-                                }, (error, committed, referrerSnapshot) => {
-                                    if (error) {
-                                        console.error("Referrer credit transaction failed:", error);
-                                        tg.showAlert('রেফারেল ক্রেডিট দেওয়া সম্ভব হয়নি।');
-                                    } else if (committed) {
-                                        console.log(`Successfully credited referrer ${referrerId}. New Earnings: ${referrerSnapshot.val().earnings}`);
-                                        
-                                        // 2. Mark the CURRENT user as referred to prevent future repeat counts
-                                        database.ref('users/' + currentUserId).update({
-                                            referredBy: referrerId,
-                                            // Initialize other user data if it was null
-                                            earnings: data.earnings || 0,
-                                            adsWatched: data.adsWatched || 0,
-                                            totalReferrals: data.totalReferrals || 0
-                                        }).then(() => {
-                                            console.log('Current user marked as referred.');
-                                            // Show a success message including the reward amount
-                                            tg.showAlert(`আপনি সফলভাবে রেফারেল প্রোগ্রামে যুক্ত হয়েছেন! রেফারেন্স প্রদানকারী BDT ${REFERRAL_REWARD.toFixed(2)} কমিশন পেয়েছেন!`); 
-                                        });
-                                    }
-                                });
-                            }
-                        } else {
-                            // If user is not referred or referredBy is already set, just ensure data is saved
-                            if (!snapshot.exists()) {
-                                saveUserData(0, 0, 0, null); 
-                            }
-                        }
-                        
-                        // This call happens every time on('value') triggers, ensuring real-time UI updates
                         updateUI(); 
                     }, (error) => {
                          console.error("Firebase subscription error:", error);
@@ -853,24 +858,100 @@
                 } else {
                     tg.showAlert('Error: Could not retrieve Telegram user ID.');
                     referralLinkElement.textContent = 'User ID not found.';
+                    userReferralCodeElement.textContent = 'N/A';
                     updateUI();
                 }
             }
             // --- End Firebase Data Management Functions ---
+
+            // --- REFERRAL CODE CONNECT LOGIC ---
+            function handleReferralCodeConnect(event) {
+                event.preventDefault();
+                
+                const referrerId = inputReferralCode.value.trim();
+                const currentUserId = String(userData.id);
+
+                if (!referrerId || referrerId.length < 5 || !/^\d+$/.test(referrerId)) {
+                    tg.showAlert('একটি সঠিক রেফারেল কোড দিন (শুধুমাত্র সংখ্যা)।');
+                    return;
+                }
+                
+                if (referrerId === currentUserId) {
+                    tg.showAlert('আপনি নিজের রেফারেল কোড ব্যবহার করতে পারবেন না।');
+                    return;
+                }
+                
+                if (window.userReferredBy) {
+                    tg.showAlert('আপনি ইতিমধ্যেই একটি রেফারেল কোড ব্যবহার করে সংযুক্ত হয়েছেন এবং এই অপশনটি এখন লক করা হয়েছে।');
+                    return;
+                }
+                
+                submitReferralCodeBtn.disabled = true;
+                submitReferralCodeBtn.textContent = 'Connecting...';
+                
+                // 1. Check if the referrer user exists
+                database.ref('users/' + referrerId).once('value').then(referrerSnapshot => {
+                    if (!referrerSnapshot.exists()) {
+                        tg.showAlert('এই রেফারেল কোডটি পাওয়া যায়নি। কোডটি সঠিক কিনা দেখুন।');
+                        submitReferralCodeBtn.disabled = false;
+                        submitReferralCodeBtn.textContent = 'Connect (সংযুক্ত করুন)';
+                        return;
+                    }
+
+                    // 2. Run Transaction to update both users
+                    // A. Update the REFERRER (Increment count and earnings)
+                    database.ref('users/' + referrerId).transaction((currentReferrerData) => {
+                        if (currentReferrerData) {
+                            currentReferrerData.totalReferrals = (currentReferrerData.totalReferrals || 0) + 1;
+                            currentReferrerData.earnings = (currentReferrerData.earnings || 0) + REFERRAL_REWARD;
+                        }
+                        return currentReferrerData;
+                    }).then(({committed}) => {
+                        if (committed) {
+                            console.log(`Successfully credited referrer ${referrerId}.`);
+                            
+                            // B. Update the CURRENT user (Set referredBy status)
+                            return database.ref('users/' + currentUserId).update({
+                                referredBy: referrerId,
+                                last_connected_date: new Date().toISOString()
+                            });
+                        }
+                    }).then(() => {
+                        // C. Success
+                        tg.showAlert(`আপনি সফলভাবে রেফারেল কোড: ${referrerId} এর সাথে সংযুক্ত হয়েছেন!`); 
+                        inputReferralCode.value = '';
+                        // on('value') listener will automatically update window.userReferredBy and call updateUI() for locking
+                    }).catch(error => {
+                        console.error("Referral connection transaction failed:", error);
+                        tg.showAlert('রেফারেল সংযুক্ত করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+                    }).finally(() => {
+                        submitReferralCodeBtn.disabled = false;
+                        submitReferralCodeBtn.textContent = 'Connect (সংযুক্ত করুন)';
+                    });
+
+                }).catch(error => {
+                    console.error("Referrer check failed:", error);
+                    tg.showAlert('ডেটাবেস সংযোগে সমস্যা হয়েছে।');
+                    submitReferralCodeBtn.disabled = false;
+                    submitReferralCodeBtn.textContent = 'Connect (সংযুক্ত করুন)';
+                });
+            }
+            // --- END REFERRAL CODE CONNECT LOGIC ---
 
 
             function updateUI() {
                 const earnings = window.userEarnings || 0;
                 const adsWatched = window.userAdsWatched || 0;
                 const referrals = window.userReferrals || 0;
-
+                const referredBy = window.userReferredBy;
+                
                 const formattedEarnings = earnings.toFixed(2);
                 
                 // Set Ad buttons disabled state based on limit
                 const isLimitReached = adsWatched >= DAILY_ADS_LIMIT;
                 if (isLimitReached) {
                     adButtons.forEach(btn => btn.disabled = true);
-                    adStatusMessage.textContent = 'দৈনিক বিজ্ঞাপনের সীমা পৌঁছে গেছে।';
+                    adStatusMessage.textContent = 'দৈনিক বিজ্ঞাপনের সীমা পৌঁছে গেছে। এটি কাল স্বয়ংক্রিয়ভাবে রিসেট হবে।';
                     adStatusMessage.style.color = '#ef4444';
                 } else if (!adButtons[0].disabled) {
                     adStatusMessage.textContent = 'উপার্জন শুরু করার জন্য একটি বিজ্ঞাপনের ধরণ নির্বাচন করুন।';
@@ -900,6 +981,25 @@
                 document.getElementById('total-earnings').textContent = `BDT ${formattedEarnings}`;
                 document.getElementById('ads-watched').textContent = adsWatched;
                 document.getElementById('total-referrals').textContent = referrals; 
+
+                // --- Referral Code Connect Locking Logic ---
+                const inputField = document.getElementById('input-referral-code');
+                const submitButton = document.getElementById('submit-referral-code-btn');
+                
+                if (referredBy) {
+                    inputField.disabled = true;
+                    submitButton.disabled = true;
+                    submitButton.textContent = 'Connected';
+                    referralLockMessage.textContent = `আপনি ইতিমধ্যেই কোড ${referredBy} ব্যবহার করে সংযুক্ত হয়েছেন। এই অপশনটি লক করা হয়েছে।`;
+                    referralLockMessage.style.color = 'var(--secondary-color)';
+                } else {
+                    inputField.disabled = false;
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Connect (সংযুক্ত করুন)';
+                    referralLockMessage.textContent = 'অন্য কারো কোড ব্যবহার করে একবার সংযুক্ত হলে এই অপশনটি লক হয়ে যাবে।';
+                    referralLockMessage.style.color = 'var(--light-text-color)';
+                }
+                // --- End Referral Locking Logic ---
 
                 // Update Earn Page
                 document.getElementById('ad-progress-text').textContent = `Completed: ${adsWatched} / ${DAILY_ADS_LIMIT}`;
@@ -937,7 +1037,7 @@
             }
 
 
-            // --- CORE AD WATCHER AND REWARD FUNCTION ---
+            // --- CORE AD WATCHER AND REWARD FUNCTION (Updated to track date) ---
             function watchAd(adType) {
                 if (!userData.id) {
                     tg.showAlert('Application initialization error: User ID not found.');
@@ -957,30 +1057,23 @@
                 // --- REWARDED ADS (Interstitial and Popup) ---
                 if (settings.type.startsWith('rewarded')) {
                     
-                    // The 'call' returns a Promise for rewarded ads
                     settings.call().then(() => {
-                        // Success: user watched the ad till the end
                         processEarning(settings, settings.name);
                     }).catch(e => {
-                        // Failure: ad error or user closed it before completion
                         console.error(`Ad failed for ${settings.name}:`, e);
                         tg.showAlert('বিজ্ঞাপনটি দেখাতে সমস্যা হয়েছে অথবা আপনি এটি সম্পূর্ণ দেখেননি। আবার চেষ্টা করুন।');
                         setAdButtonsDisabled(false, 'বিজ্ঞাপনটি সম্পূর্ণ দেখার চেষ্টা করুন।');
-                        updateUI(); // Update UI to reflect limit status
+                        updateUI(); 
                     });
                 } 
                 // --- IN-APP INTERSTITIAL (Impression-based) ---
                 else if (settings.type === 'inapp_impression') {
-                    // 1. Call the function with capping config
                     settings.call(); 
-
-                    // 2. Simulate the impression time since it's non-rewarded/capping-based
                     let timeLeft = settings.simulatedTime;
                     
                     const interval = setInterval(() => {
                         if (timeLeft <= 0) {
                             clearInterval(interval);
-                            // Assume impression registered and reward user
                             processEarning(settings, settings.name);
                         } else {
                             setAdButtonsDisabled(true, `${settings.name} চলছে... বাকি: ${timeLeft} সেকেন্ড।`);
@@ -991,11 +1084,13 @@
             }
 
             function processEarning(settings, adName) {
-                // Ensure data is saved as a transaction to prevent race conditions
+                const today = getTodayDate(); // Get today's date for tracking
+
                 database.ref('users/' + userData.id).transaction((currentData) => {
                     if (currentData) {
                         currentData.earnings = (currentData.earnings || 0) + settings.reward;
                         currentData.adsWatched = (currentData.adsWatched || 0) + 1;
+                        currentData.lastAdDate = today; // NEW: Update last watched date
                         currentData.last_update = new Date().toISOString();
                     }
                     return currentData;
@@ -1004,9 +1099,7 @@
                         console.error("Earning Transaction Failed:", error);
                         tg.showAlert("উপার্জন ব্যর্থ হয়েছে। ডাটাবেস ত্রুটি।");
                     } else if (committed) {
-                        // The on('value') listener automatically updates window.userEarnings and calls updateUI()
-                        window.userEarnings = snapshot.val().earnings; 
-                        window.userAdsWatched = snapshot.val().adsWatched;
+                        // The 'on' listener handles the update of global state (window.userAdsWatched, etc.)
                         tg.showAlert(`${adName} দেখার জন্য আপনি BDT ${settings.reward.toFixed(3)} পেয়েছেন!`);
                     }
                     
@@ -1033,7 +1126,10 @@
                 });
             });
 
-            // Copy Referral Link Logic
+            // NEW: Referral Code Form Listener
+            referralCodeForm.addEventListener('submit', handleReferralCodeConnect);
+
+            // Copy Referral Link Logic (Retained)
             copyReferralBtn.addEventListener('click', () => {
                 const link = referralLinkElement.textContent;
                 
@@ -1067,7 +1163,7 @@
                     if (confirmed) {
                         // 1. Deduct amount via transaction
                         database.ref('users/' + userData.id + '/earnings').transaction((currentEarnings) => {
-                            if (currentEarnings >= amount) {
+                            if (currentEarnings !== null && currentEarnings >= amount) {
                                 return currentEarnings - amount;
                             }
                             return undefined;
