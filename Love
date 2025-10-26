@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ask Her Out</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: sans-serif;
+      }
+
+      body {
+        width: 100%;
+        min-height: 100vh;
+        background-color: #ffe5e5;
+        /* Position body relative for absolute positioned elements */
+        position: relative; 
+      }
+
+      /* --- Page Display Management (Crucial Fix) --- */
+      .page {
+        display: none; /* Hides all pages by default */
+        width: 100%;
+        min-height: 100vh;
+        /* Center content within the page */
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+        /* Absolute position ensures only one takes up space at a time */
+        position: absolute; 
+        top: 0;
+        left: 0;
+      }
+
+      .page.active {
+        display: flex; /* Only shows the active page */
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        max-width: 500px;
+        margin: 20px;
+        padding: 20px;
+        border-radius: 10px;
+      }
+
+      .container .tenor-gif-embed {
+        max-width: 200px;
+      }
+
+      .container .btn {
+        display: flex;
+        gap: 25px;
+        z-index: 10; /* Ensures buttons are clickable */
+      }
+
+      .btn a {
+        text-decoration: none;
+        color: #111;
+        background: #fff;
+        padding: 10px 25px;
+        border-radius: 8px;
+        box-shadow: 0.5rem 1rem 3rem hsl(0, 0%, 0%, 0.3);
+        transition: transform 0.1s ease;
+      }
+    </style>
+  </head>
+  <body>
+    <section id="index-page" class="page active">
+      <div class="container">
+        <div
+          class="tenor-gif-embed"
+          data-postid="22885016"
+          data-share-method="host"
+          data-aspect-ratio="1.04918"
+          data-width="100%"
+        >
+          <a href="https://tenor.com/view/manja-gif-22885016">Manja Sticker</a
+          >from
+          <a href="https://tenor.com/search/manja-stickers">Manja Stickers</a>
+        </div>
+        <script
+          type="text/javascript"
+          async
+          src="https://tenor.com/embed.js"
+        ></script>
+        <h1>DO you love me? 🤗</h1>
+        <p>~Ankit is all yours</p>
+
+        <div class="btn">
+          <a href="#yes-page" class="nav-link">Yes</a>
+          <a href="#no1-page" class="nav-link">No</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="no1-page" class="page">
+      <div class="container">
+        <div
+          class="tenor-gif-embed"
+          data-postid="22050818"
+          data-share-method="host"
+          data-aspect-ratio="1"
+          data-width="100%"
+        >
+          <a href="https://tenor.com/view/mochi-gif-22050818">Mochi Sticker</a
+          >from
+          <a href="https://tenor.com/search/mochi-stickers">Mochi Stickers</a>
+        </div>
+        <script
+          type="text/javascript"
+          async
+          src="https://tenor.com/embed.js"
+        ></script>
+        <h1>Please think again! 🙄</h1>
+        <p>Don't say it too soon.😥</p>
+
+        <div class="btn">
+          <a href="#yes-page" class="nav-link">Yes</a>
+          <a href="#no2-page" class="nav-link">No</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="no2-page" class="page">
+      <div class="container">
+        <div
+          class="tenor-gif-embed"
+          data-postid="15195810"
+          data-share-method="host"
+          data-aspect-ratio="1"
+          data-width="100%"
+        >
+          <a
+            href="https://tenor.com/view/couple-forgive-me-asking-for-forgiveness-begging-crying-gif-15195810"
+            >Couple Forgive Me Sticker</a
+          >from
+          <a href="https://tenor.com/search/couple-stickers">Couple Stickers</a>
+        </div>
+        <script
+          type="text/javascript"
+          async
+          src="https://tenor.com/embed.js"
+        ></script>
+
+        <h1>Think again! 😣 </h1>
+        <p>Why do you do this? 😣</p>
+
+        <div class="btn">
+          <a href="#yes-page" class="nav-link">Yes</a>
+          <a href="#no3-page" class="nav-link">No</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="no3-page" class="page">
+      <div class="container">
+        <div
+          class="tenor-gif-embed"
+          data-postid="15974530976611222074"
+          data-share-method="host"
+          data-aspect-ratio="1.26923"
+          data-width="100%"
+        >
+          <a
+            href="https://tenor.com/view/peach-goma-phone-gif-15974530976611222074"
+            >Peach Goma Phone Sticker</a
+          >from
+          <a href="https://tenor.com/search/peach+goma-stickers"
+            >Peach Goma Stickers</a
+          >
+        </div>
+        <script
+          type="text/javascript"
+          async
+          src="https://tenor.com/embed.js"
+        ></script>
+
+        <h1>Don't go, child! How many thoughts are you eating? 😭
+</h1>
+        <p>bhut glt baat hai yaar😭</p>
+
+        <div class="btn">
+          <a href="#yes-page" class="nav-link">Yes</a>
+          <a href="#" id="move-random" class="nav-link">No</a> 
+        </div>
+      </div>
+    </section>
+
+    <section id="yes-page" class="page">
+      <div class="container">
+        <div
+          class="tenor-gif-embed"
+          data-postid="253027946666209433"
+          data-share-method="host"
+          data-aspect-ratio="1.37853"
+          data-width="100%"
+        >
+          <a
+            href="https://tenor.com/view/mochi-cat-mochi-and-goma-goma-and-peach-mochi-mochi-peach-cat-gif-gif-253027946666209433"
+            >Mochi Cat GIF</a
+          >from <a href="https://tenor.com/search/mochi-gifs">Mochi GIFs</a>
+        </div>
+        <script
+          type="text/javascript"
+          async
+          src="https://tenor.com/embed.js"
+        ></script>
+        <h1>Hehehehe, I knew it! Love you a lot 😘</h1>
+      </div>
+    </section>
+
+    <script>
+      // --- Page Navigation Logic ---
+      const allPages = document.querySelectorAll('.page');
+      const navLinks = document.querySelectorAll('.nav-link');
+
+      function showPage(targetId) {
+        // Remove 'active' class from all pages
+        allPages.forEach(page => page.classList.remove('active'));
+
+        // Get the target page and add 'active' class
+        const targetPage = document.querySelector(targetId);
+        if (targetPage) {
+          targetPage.classList.add('active');
+        }
+      }
+
+      // Listen for clicks on all navigation links
+      navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          // If the link is the special 'move-random' link, let the random function handle it
+          if (this.id === 'move-random') {
+            return; // Exit here, don't change the page
+          }
+          e.preventDefault(); // Stop the default anchor jump
+          const targetId = this.getAttribute('href');
+          showPage(targetId);
+        });
+      });
+
+      // --- Random Moving Button Logic ---
+      const moveRandom = document.querySelector("#move-random");
+
+      function moveRandomEl(elm) {
+        // Set position to absolute to allow 'top' and 'left' to position it anywhere
+        elm.style.position = "absolute";
+        
+        // Calculate new random position (between 5% and 95% to keep it visible)
+        elm.style.top = Math.floor(Math.random() * 90 + 5) + "%";
+        elm.style.left = Math.floor(Math.random() * 90 + 5) + "%";
+      }
+      
+      // Desktop: Moves on mouse over
+      moveRandom.addEventListener("mouseenter", function (e) {
+        moveRandomEl(e.target);
+      });
+
+      // Mobile: Moves on touch start (for touchscreens)
+      moveRandom.addEventListener("touchstart", function (e) {
+        e.preventDefault(); // Prevent touch from triggering unwanted events
+        moveRandomEl(e.target);
+      });
+      
+    </script>
+  </body>
+</html>
